@@ -165,7 +165,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <body>
         <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
           <div className="min-h-screen bg-background">
-            <Header />
+            {/* <Header /> */}
             <main>{children}</main>
             {/* <Footer /> */}
           </div>
