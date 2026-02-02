@@ -16,6 +16,8 @@ import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as StripeConnectReturnRouteImport } from './routes/stripe-connect/return'
+import { Route as StripeConnectRefreshRouteImport } from './routes/stripe-connect/refresh'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
 import { Route as ProfileUserIdIndexRouteImport } from './routes/profile/$userId/index'
 import { Route as DashboardAdminUsersRouteImport } from './routes/dashboard/admin/users'
@@ -56,6 +58,16 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRoute,
 } as any)
+const StripeConnectReturnRoute = StripeConnectReturnRouteImport.update({
+  id: '/stripe-connect/return',
+  path: '/stripe-connect/return',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StripeConnectRefreshRoute = StripeConnectRefreshRouteImport.update({
+  id: '/stripe-connect/refresh',
+  path: '/stripe-connect/refresh',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -85,10 +97,12 @@ export interface FileRoutesByFullPath {
   '/suspended': typeof SuspendedRoute
   '/unauthenticated': typeof UnauthenticatedRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
+  '/stripe-connect/refresh': typeof StripeConnectRefreshRoute
+  '/stripe-connect/return': typeof StripeConnectReturnRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/dashboard/admin/users': typeof DashboardAdminUsersRoute
-  '/profile/$userId': typeof ProfileUserIdIndexRoute
+  '/profile/$userId/': typeof ProfileUserIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -97,6 +111,8 @@ export interface FileRoutesByTo {
   '/suspended': typeof SuspendedRoute
   '/unauthenticated': typeof UnauthenticatedRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
+  '/stripe-connect/refresh': typeof StripeConnectRefreshRoute
+  '/stripe-connect/return': typeof StripeConnectReturnRoute
   '/dashboard': typeof DashboardIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/dashboard/admin/users': typeof DashboardAdminUsersRoute
@@ -111,6 +127,8 @@ export interface FileRoutesById {
   '/suspended': typeof SuspendedRoute
   '/unauthenticated': typeof UnauthenticatedRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
+  '/stripe-connect/refresh': typeof StripeConnectRefreshRoute
+  '/stripe-connect/return': typeof StripeConnectReturnRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/dashboard/admin/users': typeof DashboardAdminUsersRoute
@@ -126,10 +144,12 @@ export interface FileRouteTypes {
     | '/suspended'
     | '/unauthenticated'
     | '/dashboard/settings'
+    | '/stripe-connect/refresh'
+    | '/stripe-connect/return'
     | '/dashboard/'
     | '/api/auth/$'
     | '/dashboard/admin/users'
-    | '/profile/$userId'
+    | '/profile/$userId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -138,6 +158,8 @@ export interface FileRouteTypes {
     | '/suspended'
     | '/unauthenticated'
     | '/dashboard/settings'
+    | '/stripe-connect/refresh'
+    | '/stripe-connect/return'
     | '/dashboard'
     | '/api/auth/$'
     | '/dashboard/admin/users'
@@ -151,6 +173,8 @@ export interface FileRouteTypes {
     | '/suspended'
     | '/unauthenticated'
     | '/dashboard/settings'
+    | '/stripe-connect/refresh'
+    | '/stripe-connect/return'
     | '/dashboard/'
     | '/api/auth/$'
     | '/dashboard/admin/users'
@@ -164,6 +188,8 @@ export interface RootRouteChildren {
   SignUpRoute: typeof SignUpRoute
   SuspendedRoute: typeof SuspendedRoute
   UnauthenticatedRoute: typeof UnauthenticatedRoute
+  StripeConnectRefreshRoute: typeof StripeConnectRefreshRoute
+  StripeConnectReturnRoute: typeof StripeConnectReturnRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ProfileUserIdIndexRoute: typeof ProfileUserIdIndexRoute
 }
@@ -219,6 +245,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/stripe-connect/return': {
+      id: '/stripe-connect/return'
+      path: '/stripe-connect/return'
+      fullPath: '/stripe-connect/return'
+      preLoaderRoute: typeof StripeConnectReturnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stripe-connect/refresh': {
+      id: '/stripe-connect/refresh'
+      path: '/stripe-connect/refresh'
+      fullPath: '/stripe-connect/refresh'
+      preLoaderRoute: typeof StripeConnectRefreshRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard/settings': {
       id: '/dashboard/settings'
       path: '/settings'
@@ -229,7 +269,7 @@ declare module '@tanstack/react-router' {
     '/profile/$userId/': {
       id: '/profile/$userId/'
       path: '/profile/$userId'
-      fullPath: '/profile/$userId'
+      fullPath: '/profile/$userId/'
       preLoaderRoute: typeof ProfileUserIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -273,6 +313,8 @@ const rootRouteChildren: RootRouteChildren = {
   SignUpRoute: SignUpRoute,
   SuspendedRoute: SuspendedRoute,
   UnauthenticatedRoute: UnauthenticatedRoute,
+  StripeConnectRefreshRoute: StripeConnectRefreshRoute,
+  StripeConnectReturnRoute: StripeConnectReturnRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ProfileUserIdIndexRoute: ProfileUserIdIndexRoute,
 }
