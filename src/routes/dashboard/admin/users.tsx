@@ -3,15 +3,9 @@ import { useState } from "react";
 import { Page } from "~/components/Page";
 import { AppBreadcrumb } from "~/components/AppBreadcrumb";
 import { CreateUserDialog } from "~/components/CreateUserDialog";
-import { EditUserDialog } from "~/components/EditUserDialog";
+import { ConfirmDeleteDialog } from "~/components/ConfirmDeleteDialog";
 import { ConfirmSuspendDialog } from "~/components/ConfirmSuspendDialog";
-import { ResetPasswordDialog } from "~/components/ResetPasswordDialog";
-import { assertAuthenticatedFn } from "~/fn/guards";
-import {
-  useAdminListUsers,
-  useUpdateUserStatus,
-  useUpdateUserRole,
-} from "~/hooks/useUsers";
+import { useAuth, useUsers, useDeleteUser, useSuspendUser, useActivateUser, useUpdateUserRole, useCreateUser } from "~/hooks/api";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Badge } from "~/components/ui/badge";
@@ -40,6 +34,7 @@ import {
   CheckCircle,
   Pencil,
   Key,
+  Plus,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -49,19 +44,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import type { UserRole, UserStatus } from "~/db/schema";
+import type { User } from "~/api-services";
 
 export const Route = createFileRoute("/dashboard/admin/users")({
   component: AdminUsersPage,
-  beforeLoad: async () => {
-    await assertAuthenticatedFn();
-  },
 });
 
 // Helper to format role for display
-function formatRole(role: UserRole | null): string {
+function formatRole(role: string | null): string {
   if (!role) return "No Role";
-  const roleMap: Record<UserRole, string> = {
+  const roleMap: Record<string, string> = {
     super_admin: "Super Admin",
     admin: "Admin",
     guest: "Guest",
@@ -70,56 +62,45 @@ function formatRole(role: UserRole | null): string {
 }
 
 // Helper to get badge variant based on status
-function getStatusVariant(
-  status: UserStatus
-): "default" | "secondary" | "destructive" | "outline" {
+function getStatusVariant(status: string): "default" | "secondary" | "destructive" | "outline" {
   return status === "active" ? "default" : "destructive";
 }
 
 // Helper to get badge variant based on role
-function getRoleVariant(
-  role: UserRole | null
-): "default" | "secondary" | "destructive" | "outline" {
+function getRoleVariant(role: string | null): "default" | "secondary" | "destructive" | "outline" {
   if (!role) return "outline";
   if (role === "super_admin") return "default";
   return "secondary";
 }
 
 interface UserActionsDropdownProps {
-  userId: string;
-  userName: string;
-  userEmail: string;
-  userStatus: UserStatus;
-  userRole: UserRole | null;
+  user: User;
+  onEdit: (user: User) => void;
+  onDelete: (userId: string) => void;
+  onSuspend: (userId: string) => void;
+  onActivate: (userId: string) => void;
+  onRoleChange: (userId: string, role: string) => void;
 }
 
 function UserActionsDropdown({
-  userId,
-  userName,
-  userEmail,
-  userStatus,
-  userRole,
+  user,
+  onEdit,
+  onDelete,
+  onSuspend,
+  onActivate,
+  onRoleChange,
 }: UserActionsDropdownProps) {
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
-  const updateStatusMutation = useUpdateUserStatus();
-  const updateRoleMutation = useUpdateUserRole();
 
-  const isSuspending = userStatus === "active";
+  const isSuspending = user.status === "active";
 
   const handleStatusToggle = () => {
-    const newStatus = isSuspending ? "suspended" : "active";
-    updateStatusMutation.mutate(
-      { data: { userId, status: newStatus } },
-      {
-        onSuccess: () => {
-          setConfirmDialogOpen(false);
-        },
-      }
-    );
-  };
-
-  const handleRoleChange = (role: UserRole | null) => {
-    updateRoleMutation.mutate({ data: { userId, role } });
+    if (isSuspending) {
+      onSuspend(user.id);
+    } else {
+      onActivate(user.id);
+    }
+    setConfirmDialogOpen(true);
   };
 
   return (
@@ -134,37 +115,16 @@ function UserActionsDropdown({
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <EditUserDialog
-            user={{
-              id: userId,
-              name: userName,
-              email: userEmail,
-              role: userRole,
-            }}
-            trigger={
-              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                <Pencil className="h-4 w-4 mr-2" />
-                Edit User
-              </DropdownMenuItem>
-            }
-          />
-          <ResetPasswordDialog
-            user={{
-              id: userId,
-              name: userName,
-              email: userEmail,
-            }}
-            trigger={
-              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                <Key className="h-4 w-4 mr-2" />
-                Reset Password
-              </DropdownMenuItem>
-            }
-          />
-          <DropdownMenuItem
-            onClick={() => setConfirmDialogOpen(true)}
-            disabled={updateStatusMutation.isPending}
-          >
+          <DropdownMenuItem onClick={() => onEdit(user)}>
+            <Pencil className="h-4 w-4 mr-2" />
+            Edit User
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onDelete(user.id)}>
+            <Key className="h-4 w-4 mr-2 text-destructive" />
+            Delete User
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={handleStatusToggle}>
             {isSuspending ? (
               <>
                 <Ban className="h-4 w-4 mr-2" />
@@ -182,31 +142,14 @@ function UserActionsDropdown({
             <UserCog className="h-4 w-4" />
             Change Role
           </DropdownMenuLabel>
-          <DropdownMenuItem
-            onClick={() => handleRoleChange("super_admin")}
-            disabled={
-              userRole === "super_admin" || updateRoleMutation.isPending
-            }
-          >
+          <DropdownMenuItem onClick={() => onRoleChange(user.id, "super_admin")}>
             Super Admin
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => handleRoleChange("admin")}
-            disabled={userRole === "admin" || updateRoleMutation.isPending}
-          >
+          <DropdownMenuItem onClick={() => onRoleChange(user.id, "admin")}>
             Admin
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => handleRoleChange("guest")}
-            disabled={userRole === "guest" || updateRoleMutation.isPending}
-          >
+          <DropdownMenuItem onClick={() => onRoleChange(user.id, "guest")}>
             Guest
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => handleRoleChange(null)}
-            disabled={userRole === null || updateRoleMutation.isPending}
-          >
-            Remove Role
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -215,8 +158,8 @@ function UserActionsDropdown({
         open={confirmDialogOpen}
         onOpenChange={setConfirmDialogOpen}
         onConfirm={handleStatusToggle}
-        isPending={updateStatusMutation.isPending}
-        userName={userName}
+        isPending={false}
+        userName={user.name}
         isSuspending={isSuspending}
       />
     </>
@@ -225,29 +168,35 @@ function UserActionsDropdown({
 
 function UsersTable() {
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<UserStatus | "all">("all");
-  const [roleFilter, setRoleFilter] = useState<UserRole | "all">("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "suspended">("all");
+  const [roleFilter, setRoleFilter] = useState<"all" | "super_admin" | "admin" | "guest">("all");
   const [page, setPage] = useState(1);
   const limit = 10;
 
-  const { data, isLoading, error } = useAdminListUsers({
-    page,
-    limit,
-    search: search || undefined,
-    status: statusFilter === "all" ? undefined : statusFilter,
-    role: roleFilter === "all" ? undefined : roleFilter,
-  });
+  const { data, isLoading, error } = useUsers(page, limit, search);
+  
+  const deleteUserMutation = useDeleteUser();
+  const suspendUserMutation = useSuspendUser();
+  const activateUserMutation = useActivateUser();
+  const updateRoleMutation = useUpdateUserRole();
 
-  const users = data?.users ?? [];
+  const users = data?.data ?? [];
   const totalPages = data?.totalPages ?? 1;
   const total = data?.total ?? 0;
+
+  // Filter users based on role and status
+  const filteredUsers = users.filter(user => {
+    const statusMatch = statusFilter === "all" || user.status === statusFilter;
+    const roleMatch = roleFilter === "all" || user.role === roleFilter;
+    return statusMatch && roleMatch;
+  });
 
   if (error) {
     return (
       <Panel>
         <PanelContent>
           <div className="text-center py-8 text-destructive">
-            <p>Error loading users: {error.message}</p>
+            <p>Error loading users</p>
             <p className="text-sm text-muted-foreground mt-2">
               You may not have permission to view this page.
             </p>
@@ -262,7 +211,7 @@ function UsersTable() {
       <PanelHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <PanelTitle className="flex items-center gap-2">
           <Users className="h-5 w-5" />
-          Users ({total})
+          Users ({filteredUsers.length})
         </PanelTitle>
         <CreateUserDialog />
       </PanelHeader>
@@ -284,7 +233,7 @@ function UsersTable() {
           <Select
             value={statusFilter}
             onValueChange={(value) => {
-              setStatusFilter(value as UserStatus | "all");
+              setStatusFilter(value as "all" | "active" | "suspended");
               setPage(1);
             }}
           >
@@ -300,7 +249,7 @@ function UsersTable() {
           <Select
             value={roleFilter}
             onValueChange={(value) => {
-              setRoleFilter(value as UserRole | "all");
+              setRoleFilter(value as "all" | "super_admin" | "admin" | "guest");
               setPage(1);
             }}
           >
@@ -310,10 +259,8 @@ function UsersTable() {
             <SelectContent>
               <SelectItem value="all">All Roles</SelectItem>
               <SelectItem value="super_admin">Super Admin</SelectItem>
-              <SelectItem value="business_analyst">Business Analyst</SelectItem>
-              <SelectItem value="quality_assurance">
-                Quality Assurance
-              </SelectItem>
+              <SelectItem value="admin">Admin</SelectItem>
+              <SelectItem value="guest">Guest</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -323,7 +270,7 @@ function UsersTable() {
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
           </div>
-        ) : users.length === 0 ? (
+        ) : filteredUsers.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <p>No users found</p>
@@ -355,7 +302,7 @@ function UsersTable() {
                   </tr>
                 </thead>
                 <tbody>
-                  {users.map((user) => (
+                  {filteredUsers.map((user) => (
                     <tr
                       key={user.id}
                       className="border-b border-border hover:bg-muted/50 transition-colors"
@@ -378,11 +325,12 @@ function UsersTable() {
                       </td>
                       <td className="py-3 px-4 text-right">
                         <UserActionsDropdown
-                          userId={user.id}
-                          userName={user.name}
-                          userEmail={user.email}
-                          userStatus={user.status}
-                          userRole={user.role}
+                          user={user}
+                          onEdit={(user) => console.log("Edit user:", user)}
+                          onDelete={(userId) => deleteUserMutation.mutate(userId)}
+                          onSuspend={suspendUserMutation.mutate}
+                          onActivate={activateUserMutation.mutate}
+                          onRoleChange={(userId, role) => updateRoleMutation.mutate({ userId, role })}
                         />
                       </td>
                     </tr>

@@ -1,4 +1,4 @@
-import { Loader2 } from "lucide-react";
+import { Ban, CheckCircle } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,38 +27,38 @@ export function ConfirmSuspendDialog({
   userName,
   isSuspending,
 }: ConfirmSuspendDialogProps) {
-  const title = isSuspending ? "Suspend User" : "Activate User";
-  const description = isSuspending
-    ? `Are you sure you want to suspend ${userName ? `"${userName}"` : "this user"}? They will immediately lose access to the system.`
-    : `Are you sure you want to activate ${userName ? `"${userName}"` : "this user"}? They will regain access to the system.`;
-  const confirmLabel = isSuspending ? "Suspend" : "Activate";
-  const pendingLabel = isSuspending ? "Suspending..." : "Activating...";
-
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription>{description}</AlertDialogDescription>
+          <AlertDialogTitle>
+            {isSuspending ? "Suspend User" : "Activate User"}
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to {isSuspending ? "suspend" : "activate"} {userName}? 
+            This will {isSuspending ? "prevent" : "allow"} them from accessing the system.
+          </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isPending}>
+            Cancel
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
             disabled={isPending}
-            className={
-              isSuspending
-                ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                : "bg-primary text-primary-foreground hover:bg-primary/90"
-            }
+            className={isSuspending ? "bg-destructive hover:bg-destructive/90" : ""}
           >
             {isPending ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                {pendingLabel}
-              </>
+              "Processing..."
             ) : (
-              confirmLabel
+              <>
+                {isSuspending ? (
+                  <Ban className="h-4 w-4 mr-2" />
+                ) : (
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                )}
+                {isSuspending ? "Suspend" : "Activate"}
+              </>
             )}
           </AlertDialogAction>
         </AlertDialogFooter>
