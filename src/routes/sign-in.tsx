@@ -3,7 +3,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState, useEffect } from "react";
-import { authClient } from "~/lib/auth-client";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import {
@@ -23,8 +22,7 @@ import {
   TrendingUp,
   CheckCircle,
 } from "lucide-react";
-import { useQueryClient } from "@tanstack/react-query";
-import { userKeys } from "~/queries/users";
+import { useAuth } from "~/hooks/api";
 
 const signInSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -43,8 +41,7 @@ export const Route = createFileRoute("/sign-in")({
 function RouteComponent() {
   const router = useRouter();
   const { redirect } = Route.useSearch();
-  const queryClient = useQueryClient();
-  const [isLoading, setIsLoading] = useState(false);
+  const { signIn, mutations: { signIn: signInMutation } } = useAuth();
   const [authError, setAuthError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
@@ -97,35 +94,18 @@ function RouteComponent() {
   });
 
   const onSubmit = async (data: SignInForm) => {
-    setIsLoading(true);
     setAuthError("");
 
     try {
-      await authClient.signIn.email(
-        {
-          email: data.email,
-          password: data.password,
-        },
-        {
-          onSuccess: () => {
-            // Invalidate all user-related queries to clear cached data
-            queryClient.invalidateQueries({ queryKey: userKeys.all });
-            // Redirect to the specified URL or default to dashboard projects
-            if (redirect) {
-              window.location.href = redirect;
-            } else {
-              router.navigate({ to: "/dashboard" });
-            }
-          },
-          onError: (error) => {
-            setAuthError(error.error.message || "Invalid email or password");
-          },
-        }
-      );
+      await signIn(data);
+      // Redirect to specified URL or default to dashboard
+      if (redirect) {
+        window.location.href = redirect;
+      } else {
+        router.navigate({ to: "/dashboard" });
+      }
     } catch (error) {
-      setAuthError("An unexpected error occurred. Please try again.");
-    } finally {
-      setIsLoading(false);
+      setAuthError(error instanceof Error ? error.message : "Invalid email or password");
     }
   };
 
@@ -265,14 +245,14 @@ function RouteComponent() {
                     )}
                   />
                   <Button
-                    disabled={isLoading}
+                    disabled={signInMutation.isPending}
                     type="submit"
                     className="w-full bg-gradient-to-r from-green-600 to-green-600 hover:from-green-700 hover:to-blue-700 transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] font-medium"
                   >
-                    {isLoading && (
+                    {signInMutation.isPending && (
                       <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
                     )}
-                    {isLoading ? "Signing in..." : "Sign In"}
+                    {signInMutation.isPending ? "Signing in..." : "Sign In"}
                   </Button>
                 </div>
               </form>

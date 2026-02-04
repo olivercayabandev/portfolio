@@ -1,13 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { authClient } from "~/lib/auth-client";
+import { useAuth } from "~/hooks/api";
 
 export const Route = createFileRoute("/suspended")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
+  const { signOut } = useAuth();
+
   const handleSignOut = async () => {
-    await authClient.signOut();
+    await signOut();
     window.location.href = "/sign-in";
   };
 

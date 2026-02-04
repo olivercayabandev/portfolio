@@ -1,31 +1,23 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
 import { Home, ArrowLeft, Calendar, Lock, Edit } from "lucide-react";
 import { Page } from "~/components/Page";
 import { AppBreadcrumb } from "~/components/AppBreadcrumb";
 import { UserAvatar } from "~/components/UserAvatar";
 import { Button } from "~/components/ui/button";
 import { Panel, PanelContent } from "~/components/ui/panel";
-import { publicProfileQueryOptions } from "~/queries/profiles";
-import { authClient } from "~/lib/auth-client";
+import { useAuth, useUser, useUserProfile } from "~/hooks/api";
 
 export const Route = createFileRoute("/profile/$userId/")({
-  loader: async ({ context: { queryClient }, params: { userId } }) => {
-    await queryClient.prefetchQuery(publicProfileQueryOptions(userId));
-  },
   component: Profile,
 });
 
 function Profile() {
   const { userId } = Route.useParams();
-  const { data: session } = authClient.useSession();
-  const {
-    data: profileData,
-    isLoading,
-    error,
-  } = useQuery(publicProfileQueryOptions(userId));
+  const { user: currentUser } = useAuth();
+  const { data: user, isLoading, error } = useUser(userId);
+  const { data: profile } = useUserProfile(userId);
 
-  const isOwnProfile = session?.user?.id === userId;
+  const isOwnProfile = currentUser?.id === userId;
 
   if (isLoading) {
     return (
@@ -41,7 +33,7 @@ function Profile() {
     );
   }
 
-  if (error || !profileData) {
+  if (error || !user) {
     return (
       <Page>
         <div className="text-center space-y-4 py-12">
@@ -65,8 +57,6 @@ function Profile() {
     );
   }
 
-  const { user, profile } = profileData;
-
   return (
     <Page>
       <div className="space-y-8 max-w-4xl mx-auto">
@@ -89,7 +79,7 @@ function Profile() {
             {/* Avatar overlapping the header */}
             <div className="-mt-16 mb-4">
               <UserAvatar
-                imageKey={user.image}
+                imageUrl={user.image}
                 name={user.name}
                 size="xl"
                 className="ring-4 ring-card bg-background"

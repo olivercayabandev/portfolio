@@ -1,10 +1,9 @@
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
-import { useAvatarImage } from "~/hooks/useAvatarImage";
 import { getInitials } from "~/utils/user";
 
 interface UserAvatarProps {
-  imageKey: string | null;
-  name: string | null;
+  imageUrl?: string | null;
+  name?: string | null;
   email?: string | null;
   className?: string;
   size?: "sm" | "md" | "lg" | "xl";
@@ -18,14 +17,12 @@ const sizeMap = {
 };
 
 export function UserAvatar({
-  imageKey,
+  imageUrl,
   name,
   email,
   className = "",
   size = "md",
 }: UserAvatarProps) {
-  const { avatarUrl } = useAvatarImage(imageKey);
-
   // Get fallback text - use name initials, or first letter of email, or "U"
   const fallbackText =
     name
@@ -36,7 +33,7 @@ export function UserAvatar({
 
   return (
     <Avatar className={`${sizeMap[size]} ${className}`}>
-      {avatarUrl && <AvatarImage src={avatarUrl} alt={name || "User"} />}
+      {imageUrl && <AvatarImage src={imageUrl} alt={name || "User"} />}
       <AvatarFallback className="bg-gradient-to-br from-primary to-purple-600 text-primary-foreground font-semibold">
         {fallbackText}
       </AvatarFallback>
