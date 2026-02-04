@@ -1,5 +1,4 @@
 ---
-
 description: "Task list template for feature implementation"
 ---
 
@@ -20,26 +19,30 @@ description: "Task list template for feature implementation"
 
 ## Path Conventions
 
-- **Single project**: `src/`, `tests/` at repository root
-- **Web app**: `backend/src/`, `frontend/src/`
-- **Mobile**: `api/src/`, `ios/src/` or `android/src/`
-- Paths shown below assume single project - adjust based on plan.md structure
+- **Frontend-only web app**: `src/` at repository root (routes, components, hooks, api-services)
+- **Routes**: `src/routes/` - TanStack Router file-based routing
+- **Components**: `src/components/` and `src/components/ui/` for shadcn UI components
+- **Hooks**: `src/hooks/` and `src/hooks/api/` for TanStack Query hooks
+- **API Services**: `src/api-services/` for external API communication
+- **Utilities**: `src/lib/` for helper functions
+- **Config**: `src/config/` for environment configuration
+- Tasks paths shown below assume frontend-only structure - adjust based on plan.md structure
 
-<!-- 
+<!--
   ============================================================================
   IMPORTANT: The tasks below are SAMPLE TASKS for illustration purposes only.
-  
+
   The /speckit.tasks command MUST replace these with actual tasks based on:
   - User stories from spec.md (with their priorities P1, P2, P3...)
   - Feature requirements from plan.md
   - Entities from data-model.md
   - Endpoints from contracts/
-  
+
   Tasks MUST be organized by user story so each story can be:
   - Implemented independently
   - Tested independently
   - Delivered as an MVP increment
-  
+
   DO NOT keep these sample tasks in the generated tasks.md file.
   ============================================================================
 -->
@@ -62,12 +65,12 @@ description: "Task list template for feature implementation"
 
 Examples of foundational tasks (adjust based on your project):
 
-- [ ] T004 Setup database schema and migrations framework
-- [ ] T005 [P] Implement authentication/authorization framework
-- [ ] T006 [P] Setup API routing and middleware structure
-- [ ] T007 Create base models/entities that all stories depend on
-- [ ] T008 Configure error handling and logging infrastructure
-- [ ] T009 Setup environment configuration management
+- [ ] T004 Setup Axios client with interceptors in src/api-services/client.ts
+- [ ] T005 [P] Implement TanStack Query provider in src/main.tsx
+- [ ] T006 [P] Configure environment variables in src/config/
+- [ ] T007 Define shared TypeScript types in src/api-services/types.ts
+- [ ] T008 Configure error handling and toast notifications with sonner
+- [ ] T009 Setup TanStack Router base configuration
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -83,17 +86,27 @@ Examples of foundational tasks (adjust based on your project):
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T010 [P] [US1] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T011 [P] [US1] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T010 [P] [US1] Contract test for [endpoint] in tests/contract/test\_[name].py
+- [ ] T011 [P] [US1] Integration test for [user journey] in tests/integration/test\_[name].py
 
 ### Implementation for User Story 1
 
-- [ ] T012 [P] [US1] Create [Entity1] model in src/models/[entity1].py
-- [ ] T013 [P] [US1] Create [Entity2] model in src/models/[entity2].py
-- [ ] T014 [US1] Implement [Service] in src/services/[service].py (depends on T012, T013)
-- [ ] T015 [US1] Implement [endpoint/feature] in src/[location]/[file].py
-- [ ] T016 [US1] Add validation and error handling
-- [ ] T017 [US1] Add logging for user story 1 operations
+- [ ] T012 [P] [US1] Create [Entity1] type in src/api-services/types.ts
+- [ ] T013 [P] [US1] Create [Entity2] type in src/api-services/types.ts
+- [ ] T014 [US1] Implement [Service] in src/api-services/[service].ts (depends on T012, T013)
+- [ ] T015 [US1] Implement [hook] in src/hooks/api/use-[service].ts to wrap service
+- [ ] T016 [US1] Implement [component/page] in src/components/[component].tsx
+- [ ] T017 [US1] Implement [route] in src/routes/[route].tsx
+- [ ] T018 [US1] Add zod validation schema and error handling
+- [ ] T019 [US1] Add loading states and toast notifications
+
+### Responsive Design Testing
+
+- [ ] T020 [US1] Test UI at mobile viewport (320px) - ensure touch targets 44x44px minimum
+- [ ] T021 [US1] Test UI at tablet viewport (768px) - verify layout adaptation
+- [ ] T022 [US1] Test UI at desktop viewport (1024px+) - verify enhanced experience
+- [ ] T023 [US1] Verify navigation works correctly on mobile devices
+- [ ] T024 [US1] Verify forms use appropriate mobile input types
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -107,8 +120,8 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Tests for User Story 2 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T018 [P] [US2] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T019 [P] [US2] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T018 [P] [US2] Contract test for [endpoint] in tests/contract/test\_[name].py
+- [ ] T019 [P] [US2] Integration test for [user journey] in tests/integration/test\_[name].py
 
 ### Implementation for User Story 2
 
@@ -129,8 +142,8 @@ Examples of foundational tasks (adjust based on your project):
 
 ### Tests for User Story 3 (OPTIONAL - only if tests requested) ⚠️
 
-- [ ] T024 [P] [US3] Contract test for [endpoint] in tests/contract/test_[name].py
-- [ ] T025 [P] [US3] Integration test for [user journey] in tests/integration/test_[name].py
+- [ ] T024 [P] [US3] Contract test for [endpoint] in tests/contract/test\_[name].py
+- [ ] T025 [P] [US3] Integration test for [user journey] in tests/integration/test\_[name].py
 
 ### Implementation for User Story 3
 

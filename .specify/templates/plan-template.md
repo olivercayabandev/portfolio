@@ -17,21 +17,61 @@
   the iteration process.
 -->
 
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
-**Project Type**: [single/web/mobile - determines source structure]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**Language/Version**: TypeScript 5.x with strict mode enabled  
+**Primary Dependencies**: TanStack Router (routing), TanStack Query (state), Tailwind CSS 4.x (styling), shadcn UI (components), React 19.x, Vite 7.x  
+**Storage**: N/A (frontend-only, external API services)  
+**Testing**: Manual testing at multiple viewport sizes; automated tests optional  
+**Target Platform**: Web browsers (mobile, tablet, desktop) with responsive design  
+**Project Type**: Web - Frontend-only application consuming external APIs  
+**Performance Goals**: Fast page loads, smooth 60fps animations, efficient TanStack Query caching  
+**Constraints**: Mobile-first responsive design, accessible (WCAG AA where possible), TypeScript strict mode  
+**Scale/Scope**: Typical SPA with multiple pages (landing, auth, dashboard, etc.)
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+_GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
-[Gates determined based on constitution file]
+**I. Clean Code Architecture**
+
+- [ ] Routes layer uses TanStack Router for routing only (no direct API calls)
+- [ ] Components receive data via props/hooks, no direct API communication
+- [ ] Hooks use TanStack Query with API services layer
+- [ ] API services layer handles all external HTTP communication
+- [ ] Type definitions centralized in `src/api-services/types.ts`
+
+**II. Simple UI/UX Principles**
+
+- [ ] Uses shadcn UI components (Radix UI primitives) where applicable
+- [ ] Tailwind CSS utility classes used for styling (avoid custom CSS)
+- [ ] Form validation with `react-hook-form` + `zod`
+- [ ] Loading states shown without disabling buttons
+- [ ] Toast notifications for user feedback (sonner)
+- [ ] Empty states provided where applicable
+
+**III. Responsive Design Standards**
+
+- [ ] Mobile-first approach confirmed
+- [ ] Tested at mobile (320px), tablet (768px), desktop (1024px+) breakpoints
+- [ ] Touch targets minimum 44x44 pixels
+- [ ] Navigation adapts to mobile devices
+- [ ] Forms usable on mobile (appropriate input types)
+
+**IV. Technology Stack Constraints**
+
+- [ ] TanStack Router used for routing
+- [ ] TanStack Query used for server state
+- [ ] Tailwind CSS 4.x used for styling
+- [ ] shadcn UI (Radix UI) components used as base
+- [ ] AXIOS used for API communication
+- [ ] TypeScript strict mode enabled
+
+**V. Code Quality Standards**
+
+- [ ] No `any` types in type definitions
+- [ ] Explicit imports (no wildcard imports)
+- [ ] Event handlers memoized with `useCallback` when needed
+- [ ] Error handling: user-friendly messages, no stack traces
+- [ ] Client-side validation for all user inputs
 
 ## Project Structure
 
@@ -48,57 +88,34 @@ specs/[###-feature]/
 ```
 
 ### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
 
 ```text
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
 src/
-├── models/
-├── services/
-├── cli/
-└── lib/
+├── routes/              # TanStack Router file-based routing
+├── components/          # Reusable React components
+│   └── ui/             # shadcn UI components (Radix UI primitives)
+├── api-services/       # External API communication layer
+│   ├── client.ts       # Axios instance with interceptors
+│   ├── auth.service.ts # Authentication API service
+│   ├── user.service.ts # User management API service
+│   ├── storage.service.ts # File storage API service
+│   └── types.ts        # TypeScript API contract types
+├── hooks/              # Custom React hooks
+│   └── api/            # TanStack Query hooks
+├── lib/                # Utility functions
+└── config/             # Environment configuration
 
-tests/
-├── contract/
-├── integration/
-└── unit/
-
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+docs/                   # Project documentation
+public/                 # Static assets
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**Structure Decision**: Frontend-only TanStack Router application with layered architecture (routes → components → hooks → services)
 
 ## Complexity Tracking
 
 > **Fill ONLY if Constitution Check has violations that must be justified**
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+| Violation                  | Why Needed         | Simpler Alternative Rejected Because |
+| -------------------------- | ------------------ | ------------------------------------ |
+| [e.g., 4th project]        | [current need]     | [why 3 projects insufficient]        |
+| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient]  |
