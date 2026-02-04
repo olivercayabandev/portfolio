@@ -1,5 +1,4 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { authClient } from "~/lib/auth-client";
 import { ModeToggle } from "./mode-toggle";
 import { Button, buttonVariants } from "./ui/button";
 import {
@@ -24,7 +23,7 @@ import { useState } from "react";
 import * as React from "react";
 import { cn } from "~/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
-import { userKeys } from "~/queries/users";
+import { useAuth } from "~/hooks/api";
 
 const dashboardLink = {
   title: "Dashboard",
@@ -46,18 +45,17 @@ const navItems = [
 ];
 
 export function Header() {
-  const { data: session, isPending } = authClient.useSession();
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { user, isAuthenticated, isLoading, signOut } = useAuth();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleSignOut = async () => {
-    await authClient.signOut();
-    // Invalidate all user-related queries to clear cached data
-    queryClient.invalidateQueries({ queryKey: userKeys.all });
+    await signOut();
+    queryClient.clear();
     navigate({ to: "/" });
   };
 
@@ -75,7 +73,7 @@ export function Header() {
             </span>
           </Link>
 
-          {session ? (
+          {isAuthenticated ? (
             <nav className="hidden md:flex items-center gap-2 text-sm">
               <Link
                 to={dashboardLink.href}
@@ -125,7 +123,7 @@ export function Header() {
         </div>
 
         {/* Mobile menu */}
-        {session && (
+        {isAuthenticated && (
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>
               <Button
@@ -189,11 +187,11 @@ export function Header() {
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
           <div className="w-full flex-1 md:w-auto md:flex-none"></div>
           <nav className="flex items-center gap-4">
-            {isPending ? (
+            {isLoading ? (
               <div className="flex h-9 w-9 items-center justify-center">
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
               </div>
-            ) : session ? (
+            ) : isAuthenticated ? (
               <>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -202,9 +200,7 @@ export function Header() {
                       className="relative h-8 w-8 rounded-full"
                     >
                       <UserAvatar
-                        imageKey={session?.user?.image || null}
-                        name={session?.user?.name || null}
-                        email={session?.user?.email || null}
+                        name={user?.name || null}
                         size="sm"
                       />
                     </Button>
@@ -216,7 +212,7 @@ export function Header() {
                           Account
                         </p>
                         <p className="text-xs leading-none text-muted-foreground">
-                          {session.user.email}
+                          {user?.email || ""}
                         </p>
                       </div>
                     </DropdownMenuLabel>
@@ -224,7 +220,7 @@ export function Header() {
                     <DropdownMenuItem asChild>
                       <Link
                         to="/profile/$userId"
-                        params={{ userId: session.user.id }}
+                        params={{ userId: user?.id || "" }}
                       >
                         <User className="mr-2 h-4 w-4" />
                         <span>Profile</span>

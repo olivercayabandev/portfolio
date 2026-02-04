@@ -1,11 +1,12 @@
 import { apiClient } from './client';
-import { 
-  SignInRequest, 
-  SignUpRequest, 
-  AuthResponse, 
-  ResetPasswordRequest, 
+import {
+  SignInRequest,
+  SignUpRequest,
+  AuthResponse,
+  ResetPasswordRequest,
   UpdatePasswordRequest,
-  AuthTokens 
+  AuthTokens,
+  User
 } from './types';
 
 export class AuthService {
@@ -106,6 +107,12 @@ export class AuthService {
   // Get current auth token
   getAuthToken(): string | null {
     return localStorage.getItem('auth_token');
+  }
+
+  // Get current user
+  async getCurrentUser(): Promise<User> {
+    const response = await apiClient.get<User>('/auth/me');
+    return response.data;
   }
 }
 

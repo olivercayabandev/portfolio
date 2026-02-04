@@ -47,8 +47,10 @@ export function FileUploadExample() {
 
       // Upload files one by one
       for (const file of selectedFiles) {
-        await uploadFile(file, 'uploads', (progress) => {
-          setUploadProgress(progress);
+        await uploadFile({
+          file,
+          folder: 'uploads',
+          onProgress: (progress) => setUploadProgress(progress),
         });
       }
 
@@ -139,7 +141,7 @@ export function FileUploadExample() {
         <CardContent>
           {isLoading ? (
             <div className="text-center py-8">Loading files...</div>
-          ) : files?.files.length > 0 ? (
+          ) : files && files.files.length > 0 ? (
             <div className="space-y-3">
               {files.files.map((file) => (
                 <div

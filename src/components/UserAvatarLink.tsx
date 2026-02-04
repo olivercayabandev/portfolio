@@ -3,7 +3,7 @@ import { UserAvatar } from "./UserAvatar";
 
 interface UserAvatarLinkProps {
   userId: string;
-  imageKey: string | null;
+  imageUrl?: string | null;
   name: string | null;
   email?: string | null;
   className?: string;
@@ -12,7 +12,7 @@ interface UserAvatarLinkProps {
 
 export function UserAvatarLink({
   userId,
-  imageKey,
+  imageUrl,
   name,
   email,
   className = "",
@@ -24,7 +24,8 @@ export function UserAvatarLink({
       params={{ userId }}
       className={`inline-block hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-full ${className}`}
     >
-      <UserAvatar imageKey={imageKey} name={name} email={email} size={size} />
+      <UserAvatar imageUrl={imageUrl} name={name} email={email} size={size} />
     </Link>
   );
 }
+

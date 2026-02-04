@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Page } from "~/components/Page";
 import { AppBreadcrumb } from "~/components/AppBreadcrumb";
-import { useAuth, useCurrentUserProfile } from "~/hooks/api";
+import { useAuth, useCurrentUser, useCurrentUserProfile } from "~/hooks/api";
 import { toast } from "sonner";
 import { useState, useCallback, useEffect } from "react";
 import { Button } from "~/components/ui/button";
@@ -46,7 +46,8 @@ type ProfileSettingsFormData = z.infer<typeof profileSettingsSchema>;
 function ProfileSettings() {
   const { user } = useAuth();
   const { profile, updateProfile, mutation: updateMutation } = useCurrentUserProfile();
-  const { uploadAvatar, isUploading } = useAuth();
+  const { uploadAvatar, mutations: { uploadAvatar: uploadAvatarMutation } } = useCurrentUser();
+  const isUploading = uploadAvatarMutation.isPending;
 
   const form = useForm<ProfileSettingsFormData>({
     resolver: zodResolver(profileSettingsSchema),
