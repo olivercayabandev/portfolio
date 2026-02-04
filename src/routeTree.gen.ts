@@ -88,7 +88,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/': typeof DashboardIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/dashboard/admin/users': typeof DashboardAdminUsersRoute
-  '/profile/$userId': typeof ProfileUserIdIndexRoute
+  '/profile/$userId/': typeof ProfileUserIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -129,7 +129,7 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/api/auth/$'
     | '/dashboard/admin/users'
-    | '/profile/$userId'
+    | '/profile/$userId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -229,7 +229,7 @@ declare module '@tanstack/react-router' {
     '/profile/$userId/': {
       id: '/profile/$userId/'
       path: '/profile/$userId'
-      fullPath: '/profile/$userId'
+      fullPath: '/profile/$userId/'
       preLoaderRoute: typeof ProfileUserIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
