@@ -3,9 +3,7 @@ import { ModeToggle } from "./mode-toggle";
 import { Button, buttonVariants } from "./ui/button";
 import {
   LogOut,
-  User,
   Menu,
-  Settings,
   Code,
   LayoutDashboard,
 } from "lucide-react";
@@ -22,7 +20,7 @@ import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { useState } from "react";
 import * as React from "react";
 import { cn } from "~/lib/utils";
-import { useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "~/hooks/api";
 
 
 const dashboardLink = {
@@ -43,20 +41,12 @@ export function Header() {
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const [user, setUser] = React.useState<any>(null);
-  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const signOut = async () => {
-    const { authService } = await import('~/api-services');
-    return authService.signOut();
-  };
+  const { user, isAuthenticated, isLoading, signOut } = useAuth();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleSignOut = async () => {
     await signOut();
-    queryClient.clear();
     navigate({ to: "/" });
   };
 
@@ -200,8 +190,10 @@ export function Header() {
                       variant="ghost"
                       className="relative h-8 w-8 rounded-full"
                     >
-                      <UserAvatar
+                  <UserAvatar
+                        imageUrl={user?.image || null}
                         name={user?.name || null}
+                        email={user?.email || null}
                         size="sm"
                       />
                     </Button>

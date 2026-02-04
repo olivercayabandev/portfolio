@@ -14,6 +14,7 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { LogIn, Eye, EyeOff } from "lucide-react";
+import { useAuth } from "~/hooks/api";
 
 
 const signInSchema = z.object({
@@ -29,11 +30,7 @@ export const Route = createFileRoute("/sign-in")({
 
 function RouteComponent() {
   const router = useRouter();
-  const signInMutation = { isPending: false };
-  const signIn = async (data: any) => {
-    const { authService } = await import('~/api-services');
-    return authService.signIn(data);
-  };
+  const { signIn, isSigningIn } = useAuth();
   const [authError, setAuthError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
@@ -88,7 +85,7 @@ function RouteComponent() {
                       placeholder="name@example.com"
                       type="email"
                       autoComplete="email"
-                      disabled={signInMutation.isPending}
+                      disabled={isSigningIn}
                       {...field}
                     />
                   </FormControl>
@@ -108,7 +105,7 @@ function RouteComponent() {
                         placeholder="Enter your password"
                         type={showPassword ? "text" : "password"}
                         autoComplete="current-password"
-                        disabled={signInMutation.isPending}
+                        disabled={isSigningIn}
                         className="pr-10"
                         {...field}
                       />
@@ -116,7 +113,7 @@ function RouteComponent() {
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                        disabled={signInMutation.isPending}
+                        disabled={isSigningIn}
                         aria-label={
                           showPassword ? "Hide password" : "Show password"
                         }
@@ -134,11 +131,11 @@ function RouteComponent() {
               )}
             />
             <Button
-              disabled={signInMutation.isPending}
+              disabled={isSigningIn}
               type="submit"
               className="w-full"
             >
-              {signInMutation.isPending ? "Signing in..." : "Sign In"}
+              {isSigningIn ? "Signing in..." : "Sign In"}
             </Button>
           </form>
         </Form>

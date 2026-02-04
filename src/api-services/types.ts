@@ -1,4 +1,3 @@
-// User and Authentication related types
 export interface User {
   id: string;
   name: string;
@@ -48,7 +47,32 @@ export interface UpdatePasswordRequest {
   password: string;
 }
 
-// API Response wrappers
+export interface GetUsersParams {
+  search?: string;
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface CreateUserInput {
+  name: string;
+  email: string;
+  password: string;
+  role?: 'super_admin' | 'admin' | 'guest';
+}
+
+export interface UpdateUserInput {
+  name?: string;
+  email?: string;
+  role?: 'super_admin' | 'admin' | 'guest';
+  status?: 'active' | 'suspended';
+}
+
+export interface UpdateProfileRequest {
+  bio?: string;
+}
+
 export interface PaginatedResponse<T> {
   data: T[];
   total: number;
@@ -63,13 +87,8 @@ export interface ApiResponse<T = unknown> {
   success: boolean;
 }
 
-// Error types
 export interface ApiError {
   message: string;
   code?: string;
   details?: unknown;
-}
-
-export interface UpdateProfileRequest {
-  bio?: string;
 }
