@@ -191,7 +191,7 @@ function RouteComponent() {
                             autoComplete="email"
                             autoCapitalize="none"
                             autoCorrect="off"
-                            disabled={isLoading}
+                            disabled={signInMutation.isPending}
                             {...field}
                           />
                         </FormControl>
@@ -213,25 +213,25 @@ function RouteComponent() {
                             Forgot password?
                           </Link>
                         </div>
-                        <FormControl>
-                          <div className="relative">
-                            <Input
-                              placeholder="Enter your password"
-                              type={showPassword ? "text" : "password"}
-                              autoComplete="current-password"
-                              disabled={isLoading}
-                              className="pr-10"
-                              {...field}
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setShowPassword(!showPassword)}
-                              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                              disabled={isLoading}
-                              aria-label={
-                                showPassword ? "Hide password" : "Show password"
-                              }
-                            >
+                          <FormControl>
+                            <div className="relative">
+                              <Input
+                                placeholder="Enter your password"
+                                type={showPassword ? "text" : "password"}
+                                autoComplete="current-password"
+                                disabled={signInMutation.isPending}
+                                className="pr-10"
+                                {...field}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                                disabled={signInMutation.isPending}
+                                aria-label={
+                                  showPassword ? "Hide password" : "Show password"
+                                }
+                              >
                               {showPassword ? (
                                 <EyeOff className="h-4 w-4" />
                               ) : (

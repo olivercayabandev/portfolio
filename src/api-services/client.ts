@@ -1,16 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-
-export interface ApiError {
-  message: string;
-  code?: string;
-  details?: unknown;
-}
-
-export interface ApiResponse<T = unknown> {
-  data: T;
-  message?: string;
-  success: boolean;
-}
+import type { ApiError, ApiResponse } from './types';
 
 class ApiClient {
   private client: AxiosInstance;

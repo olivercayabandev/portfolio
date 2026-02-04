@@ -1,10 +1,5 @@
-import {
-  createFileRoute,
-  Link,
-  Outlet,
-  useRouterState,
-  redirect,
-} from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
+import * as React from "react";
 import { cn } from "~/lib/utils";
 import { LayoutDashboard, ChevronLeft, ChevronRight, FolderKanban, Users } from "lucide-react";
 import { DashboardBackground } from "~/components/DashboardBackground";
@@ -51,13 +46,16 @@ const baseNavItems: NavItem[] = [
 function DashboardLayout() {
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
+  const navigate = useNavigate();
   const { isCollapsed, isHydrated, toggleCollapsed } = useNavigation();
   const { user: currentUser, isAuthenticated } = useAuth();
 
   // Redirect to login if not authenticated
-  if (!isAuthenticated) {
-    redirect({ to: '/sign-in' });
-  }
+  React.useEffect(() => {
+    if (!isAuthenticated) {
+      navigate({ to: '/sign-in', search: { redirect: undefined } });
+    }
+  }, [isAuthenticated, navigate]);
 
   // Filter nav items based on user role
   const navItems = useMemo(() => {

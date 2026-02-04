@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authService } from '~/api-services';
-import { SignInRequest, SignUpRequest, ResetPasswordRequest, UpdatePasswordRequest } from '~/api-services';
+import { SignInRequest, SignUpRequest, ResetPasswordRequest, UpdatePasswordRequest, User } from '~/api-services';
 
 // Query keys
 export const authKeys = {
@@ -18,7 +18,7 @@ export function useAuth() {
     isLoading,
     error,
     refetch,
-  } = useQuery({
+  } = useQuery<User | null>({
     queryKey: authKeys.user(),
     queryFn: () => authService.getCurrentUser(),
     enabled: authService.isAuthenticated(),

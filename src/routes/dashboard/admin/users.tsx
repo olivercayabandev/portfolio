@@ -330,7 +330,7 @@ function UsersTable() {
                           onDelete={(userId) => deleteUserMutation.mutate(userId)}
                           onSuspend={suspendUserMutation.mutate}
                           onActivate={activateUserMutation.mutate}
-                          onRoleChange={(userId, role) => updateRoleMutation.mutate({ userId, role })}
+                          onRoleChange={(userId, role) => updateRoleMutation.mutate({ userId, role: role as 'super_admin' | 'admin' | 'guest' })}
                         />
                       </td>
                     </tr>
