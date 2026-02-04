@@ -1,4 +1,3 @@
-// User and Authentication related types
 export interface User {
   id: string;
   name: string;
@@ -48,23 +47,32 @@ export interface UpdatePasswordRequest {
   password: string;
 }
 
-// File and Storage related types
-export interface FileUpload {
-  id: string;
+export interface GetUsersParams {
+  search?: string;
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface CreateUserInput {
   name: string;
-  type: string;
-  size: number;
-  url: string;
-  uploadedAt: string;
+  email: string;
+  password: string;
+  role?: 'super_admin' | 'admin' | 'guest';
 }
 
-export interface PresignedUploadUrl {
-  uploadUrl: string;
-  fileUrl: string;
-  fields?: Record<string, string>;
+export interface UpdateUserInput {
+  name?: string;
+  email?: string;
+  role?: 'super_admin' | 'admin' | 'guest';
+  status?: 'active' | 'suspended';
 }
 
-// API Response wrappers
+export interface UpdateProfileRequest {
+  bio?: string;
+}
+
 export interface PaginatedResponse<T> {
   data: T[];
   total: number;
@@ -79,28 +87,8 @@ export interface ApiResponse<T = unknown> {
   success: boolean;
 }
 
-// Error types
 export interface ApiError {
   message: string;
   code?: string;
   details?: unknown;
-}
-
-// Request/Response transformers
-export interface CreateUserRequest {
-  name: string;
-  email: string;
-  password: string;
-  role?: 'admin' | 'guest';
-}
-
-export interface UpdateUserRequest {
-  name?: string;
-  email?: string;
-  status?: 'active' | 'suspended';
-  role?: 'super_admin' | 'admin' | 'guest';
-}
-
-export interface UpdateProfileRequest {
-  bio?: string;
 }

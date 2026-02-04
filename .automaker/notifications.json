@@ -8,7 +8,7 @@
       "message": "\"feature-1770160545537-g117xb87f\" is ready for your review and approval.",
       "createdAt": "2026-02-04T00:13:36.547Z",
       "read": true,
-      "dismissed": false,
+      "dismissed": true,
       "featureId": "feature-1770160545537-g117xb87f",
       "projectPath": "D:\\titosolutions\\repositories\\goodbase"
     },
@@ -19,7 +19,7 @@
       "message": "\"feature-1770167906855-igg27rvwk\" is ready for your review and approval.",
       "createdAt": "2026-02-04T01:26:56.342Z",
       "read": false,
-      "dismissed": false,
+      "dismissed": true,
       "featureId": "feature-1770167906855-igg27rvwk",
       "projectPath": "D:\\titosolutions\\repositories\\tanstack-fullstack-boilerplate"
     }

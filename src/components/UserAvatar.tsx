@@ -1,5 +1,4 @@
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
-import { getInitials } from "~/utils/user";
 
 interface UserAvatarProps {
   imageUrl?: string | null;
@@ -7,6 +6,14 @@ interface UserAvatarProps {
   email?: string | null;
   className?: string;
   size?: "sm" | "md" | "lg" | "xl";
+}
+
+function getInitials(name: string): string {
+  return name
+    .split(" ")
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("")
+    .slice(0, 2);
 }
 
 const sizeMap = {

@@ -4,8 +4,7 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "dev": "[ ! -f .env ] && cp .env.example .env || true && vite dev",
-    "dev:app": "vite dev",
+    "dev": "vite dev",
     "build": "vite build && tsc --noEmit",
     "preview": "vite preview"
   },

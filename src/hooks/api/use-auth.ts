@@ -1,159 +1,103 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { authService } from '~/api-services';
-import { SignInRequest, SignUpRequest, ResetPasswordRequest, UpdatePasswordRequest, User } from '~/api-services';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useCallback, useEffect, useState } from 'react';
+import { authService, type User } from '~/api-services';
+import type { SignInRequest, SignUpRequest } from '~/api-services/types';
 
-// Query keys
-export const authKeys = {
-  all: ['auth'] as const,
-  user: () => [...authKeys.all, 'user'] as const,
-  isAuthenticated: () => [...authKeys.all, 'isAuthenticated'] as const,
-};
-
-// Hooks
 export function useAuth() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    return authService.isAuthenticated();
+  });
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
   const queryClient = useQueryClient();
 
-  const {
-    data: user,
-    isLoading,
-    error,
-    refetch,
-  } = useQuery<User | null>({
-    queryKey: authKeys.user(),
-    queryFn: () => authService.getCurrentUser(),
-    enabled: authService.isAuthenticated(),
-    retry: false,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const isAuth = authService.isAuthenticated();
+        setIsAuthenticated(isAuth);
+
+        if (isAuth) {
+          const userData = await authService.getCurrentUser();
+          setUser(userData);
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        setIsAuthenticated(false);
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   const signInMutation = useMutation({
-    mutationFn: (credentials: SignInRequest) => authService.signIn(credentials),
-    onSuccess: (data) => {
-      queryClient.setQueryData(authKeys.user(), data.user);
-      queryClient.setQueryData(authKeys.isAuthenticated(), true);
+    mutationFn: authService.signIn.bind(authService),
+    onSuccess: (data: { user: User }) => {
+      setUser(data.user);
+      setIsAuthenticated(true);
+      queryClient.invalidateQueries({ queryKey: ['auth'] });
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       console.error('Sign in failed:', error);
+      setIsAuthenticated(false);
+      setUser(null);
     },
   });
 
   const signUpMutation = useMutation({
-    mutationFn: (userData: SignUpRequest) => authService.signUp(userData),
-    onSuccess: (data) => {
-      queryClient.setQueryData(authKeys.user(), data.user);
-      queryClient.setQueryData(authKeys.isAuthenticated(), true);
+    mutationFn: authService.signUp.bind(authService),
+    onSuccess: (data: { user: User }) => {
+      setUser(data.user);
+      setIsAuthenticated(true);
+      queryClient.invalidateQueries({ queryKey: ['auth'] });
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       console.error('Sign up failed:', error);
+      setIsAuthenticated(false);
+      setUser(null);
     },
   });
 
   const signOutMutation = useMutation({
-    mutationFn: () => authService.signOut(),
+    mutationFn: authService.signOut.bind(authService),
     onSuccess: () => {
+      setUser(null);
+      setIsAuthenticated(false);
       queryClient.clear();
-      queryClient.setQueryData(authKeys.user(), null);
-      queryClient.setQueryData(authKeys.isAuthenticated(), false);
-      window.location.href = '/sign-in';
-    },
-    onError: (error) => {
-      console.error('Sign out failed:', error);
-      // Still clear local data even if server sign out fails
-      queryClient.clear();
-      queryClient.setQueryData(authKeys.user(), null);
-      queryClient.setQueryData(authKeys.isAuthenticated(), false);
-      window.location.href = '/sign-in';
     },
   });
 
-  const resetPasswordMutation = useMutation({
-    mutationFn: (request: ResetPasswordRequest) => authService.resetPassword(request),
-    onError: (error) => {
-      console.error('Reset password failed:', error);
+  const signIn = useCallback(
+    (credentials: SignInRequest) => {
+      return signInMutation.mutateAsync(credentials);
     },
-  });
+    [signInMutation]
+  );
 
-  const updatePasswordMutation = useMutation({
-    mutationFn: (request: UpdatePasswordRequest) => authService.updatePassword(request),
-    onError: (error) => {
-      console.error('Update password failed:', error);
+  const signUp = useCallback(
+    (userData: SignUpRequest) => {
+      return signUpMutation.mutateAsync(userData);
     },
-  });
+    [signUpMutation]
+  );
 
-  const verifyEmailMutation = useMutation({
-    mutationFn: (token: string) => authService.verifyEmail(token),
-    onSuccess: () => {
-      // Refetch user data to get updated email verification status
-      refetch();
-    },
-    onError: (error) => {
-      console.error('Email verification failed:', error);
-    },
-  });
-
-  const resendVerificationMutation = useMutation({
-    mutationFn: (email: string) => authService.resendVerificationEmail(email),
-    onError: (error) => {
-      console.error('Resend verification failed:', error);
-    },
-  });
-
-  const signIn = (credentials: SignInRequest) => {
-    return signInMutation.mutateAsync(credentials);
-  };
-
-  const signUp = (userData: SignUpRequest) => {
-    return signUpMutation.mutateAsync(userData);
-  };
-
-  const signOut = () => {
-    signOutMutation.mutate();
-  };
-
-  const resetPassword = (request: ResetPasswordRequest) => {
-    return resetPasswordMutation.mutateAsync(request);
-  };
-
-  const updatePassword = (request: UpdatePasswordRequest) => {
-    return updatePasswordMutation.mutateAsync(request);
-  };
-
-  const verifyEmail = (token: string) => {
-    return verifyEmailMutation.mutateAsync(token);
-  };
-
-  const resendVerification = (email: string) => {
-    return resendVerificationMutation.mutateAsync(email);
-  };
+  const signOut = useCallback(() => {
+    return signOutMutation.mutateAsync();
+  }, [signOutMutation]);
 
   return {
     user,
-    isAuthenticated: authService.isAuthenticated(),
+    isAuthenticated,
     isLoading,
-    error,
     signIn,
     signUp,
     signOut,
-    resetPassword,
-    updatePassword,
-    verifyEmail,
-    resendVerification,
-    mutations: {
-      signIn: signInMutation,
-      signUp: signUpMutation,
-      signOut: signOutMutation,
-      resetPassword: resetPasswordMutation,
-      updatePassword: updatePasswordMutation,
-      verifyEmail: verifyEmailMutation,
-      resendVerification: resendVerificationMutation,
-    },
+    isSigningIn: signInMutation.isPending,
+    isSigningUp: signUpMutation.isPending,
+    isSigningOut: signOutMutation.isPending,
   };
-}
-
-export function useIsAuthenticated() {
-  return useQuery({
-    queryKey: authKeys.isAuthenticated(),
-    queryFn: () => authService.isAuthenticated(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
 }

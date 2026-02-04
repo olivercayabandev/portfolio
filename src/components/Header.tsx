@@ -3,9 +3,7 @@ import { ModeToggle } from "./mode-toggle";
 import { Button, buttonVariants } from "./ui/button";
 import {
   LogOut,
-  User,
   Menu,
-  Settings,
   Code,
   LayoutDashboard,
 } from "lucide-react";
@@ -22,8 +20,8 @@ import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { useState } from "react";
 import * as React from "react";
 import { cn } from "~/lib/utils";
-import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "~/hooks/api";
+
 
 const dashboardLink = {
   title: "Dashboard",
@@ -37,25 +35,18 @@ const navItems = [
     href: "/dashboard",
     icon: LayoutDashboard,
   },
-  {
-    title: "Settings",
-    href: "/dashboard/settings",
-    icon: Settings,
-  },
 ];
 
 export function Header() {
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const { user, isAuthenticated, isLoading, signOut } = useAuth();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleSignOut = async () => {
     await signOut();
-    queryClient.clear();
     navigate({ to: "/" });
   };
 
@@ -199,8 +190,10 @@ export function Header() {
                       variant="ghost"
                       className="relative h-8 w-8 rounded-full"
                     >
-                      <UserAvatar
+                  <UserAvatar
+                        imageUrl={user?.image || null}
                         name={user?.name || null}
+                        email={user?.email || null}
                         size="sm"
                       />
                     </Button>
@@ -217,22 +210,6 @@ export function Header() {
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link
-                        to="/profile/$userId"
-                        params={{ userId: user?.id || "" }}
-                      >
-                        <User className="mr-2 h-4 w-4" />
-                        <span>Profile</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link to="/dashboard/settings">
-                        <Settings className="mr-2 h-4 w-4" />
-                        <span>Settings</span>
-                      </Link>
-                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleSignOut}>
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Log out</span>

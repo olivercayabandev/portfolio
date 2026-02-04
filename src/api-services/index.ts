@@ -1,9 +1,10 @@
-// Export all services and types for easy imports
-export * from './client';
-export * from './types';
 export * from './auth.service';
-export * from './user.service';
+export * from './client';
 export * from './storage.service';
+export * from './types';
+export * from './user.service';
 
-// Re-export main API client
 export { apiClient } from './client';
+export { authService } from './auth.service';
+export { storageService } from './storage.service';
+export { userService } from './user.service';
