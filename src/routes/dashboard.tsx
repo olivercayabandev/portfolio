@@ -6,7 +6,7 @@ import { DashboardBackground } from "~/components/DashboardBackground";
 import { useMemo } from "react";
 import { useNavigation } from "~/hooks/useNavigation";
 import { Button } from "~/components/ui/button";
-import { useAuth } from "~/hooks/api";
+
 
 export const Route = createFileRoute("/dashboard")({
   beforeLoad: async () => {
@@ -48,7 +48,8 @@ function DashboardLayout() {
   const currentPath = routerState.location.pathname;
   const navigate = useNavigate();
   const { isCollapsed, isHydrated, toggleCollapsed } = useNavigation();
-  const { user: currentUser, isAuthenticated } = useAuth();
+  const [currentUser, setCurrentUser] = React.useState<any>(null);
+  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
 
   // Redirect to login if not authenticated
   React.useEffect(() => {

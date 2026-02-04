@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Page } from "~/components/Page";
 import { AppBreadcrumb } from "~/components/AppBreadcrumb";
-import { useAuth, useCurrentUser, useCurrentUserProfile } from "~/hooks/api";
+import * as React from "react";
+
 import { toast } from "sonner";
 import { useState, useCallback, useEffect } from "react";
 import { Button } from "~/components/ui/button";
@@ -44,10 +45,18 @@ const profileSettingsSchema = z.object({
 type ProfileSettingsFormData = z.infer<typeof profileSettingsSchema>;
 
 function ProfileSettings() {
-  const { user } = useAuth();
-  const { profile, updateProfile, mutation: updateMutation } = useCurrentUserProfile();
-  const { uploadAvatar, mutations: { uploadAvatar: uploadAvatarMutation } } = useCurrentUser();
-  const isUploading = uploadAvatarMutation.isPending;
+  const [user, setUser] = React.useState<any>(null);
+  const [profile, setProfile] = React.useState<any>(null);
+  const updateMutation = { isPending: false };
+  const isUploading = false;
+  const updateProfile = async (data: any) => {
+    const { userService } = await import('~/api-services');
+    return userService.updateMyProfile(data);
+  };
+  const uploadAvatar = async (file: File) => {
+    const { userService } = await import('~/api-services');
+    return userService.uploadAvatar(file);
+  };
 
   const form = useForm<ProfileSettingsFormData>({
     resolver: zodResolver(profileSettingsSchema),

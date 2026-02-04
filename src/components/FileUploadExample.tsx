@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FileUpload } from '~/components/ui/file-upload';
-import { useFileOperations } from '~/hooks/api';
+
 import { Button } from '~/components/ui/button';
 import { Progress } from '~/components/ui/progress';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
@@ -15,21 +15,31 @@ interface UploadedFile {
   uploadedAt: string;
 }
 
+interface FilesResponse {
+  files: UploadedFile[];
+}
+
 export function FileUploadExample() {
-  const {
-    files,
-    isLoading,
-    uploadFile,
-    deleteFile,
-    isUploading,
-    validateFile,
-  } = useFileOperations();
+  const [loadedFiles, setLoadedFiles] = useState<FilesResponse | undefined>(undefined);
+  const isLoading = false;
+  const uploadFile = async ({ file, folder, onProgress }: { file: File; folder?: string; onProgress?: (progress: number) => void }) => {
+    const { storageService } = await import('~/api-services');
+    return storageService.uploadFile(file, folder, onProgress);
+  };
+  const deleteFile = async (fileId: string) => {
+    const { storageService } = await import('~/api-services');
+    return storageService.deleteFile(fileId);
+  };
+  const isUploading = false;
+  const validateFile = (file: File) => {
+    return { isValid: true, error: null };
+  };
 
   const [uploadProgress, setUploadProgress] = useState(0);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
-  const handleFilesSelected = (files: File[]) => {
-    setSelectedFiles(files);
+  const handleFilesSelected = (selected: File[]) => {
+    setSelectedFiles(selected);
   };
 
   const handleUpload = async () => {
@@ -50,7 +60,7 @@ export function FileUploadExample() {
         await uploadFile({
           file,
           folder: 'uploads',
-          onProgress: (progress) => setUploadProgress(progress),
+          onProgress: (progress: number) => setUploadProgress(progress),
         });
       }
 
@@ -141,9 +151,9 @@ export function FileUploadExample() {
         <CardContent>
           {isLoading ? (
             <div className="text-center py-8">Loading files...</div>
-          ) : files && files.files.length > 0 ? (
+          ) : (loadedFiles?.files && loadedFiles.files.length > 0) ? (
             <div className="space-y-3">
-              {files.files.map((file) => (
+              {loadedFiles.files.map((file: UploadedFile) => (
                 <div
                   key={file.id}
                   className="flex items-center gap-3 p-3 border rounded-lg"

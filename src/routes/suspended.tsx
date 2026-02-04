@@ -1,12 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useAuth } from "~/hooks/api";
+
 
 export const Route = createFileRoute("/suspended")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const { signOut } = useAuth();
+  const signOut = async () => {
+    const { authService } = await import('~/api-services');
+    return authService.signOut();
+  };
 
   const handleSignOut = async () => {
     await signOut();

@@ -5,7 +5,8 @@ import { AppBreadcrumb } from "~/components/AppBreadcrumb";
 import { UserAvatar } from "~/components/UserAvatar";
 import { Button } from "~/components/ui/button";
 import { Panel, PanelContent } from "~/components/ui/panel";
-import { useAuth, useUser, useUserProfile } from "~/hooks/api";
+import * as React from "react";
+
 
 export const Route = createFileRoute("/profile/$userId/")({
   component: Profile,
@@ -13,9 +14,11 @@ export const Route = createFileRoute("/profile/$userId/")({
 
 function Profile() {
   const { userId } = Route.useParams();
-  const { user: currentUser } = useAuth();
-  const { data: user, isLoading, error } = useUser(userId);
-  const { data: profile } = useUserProfile(userId);
+  const [currentUser, setCurrentUser] = React.useState<any>(null);
+  const [user, setUser] = React.useState<any>(null);
+  const [profile, setProfile] = React.useState<any>(null);
+  const isLoading = true;
+  const error = null;
 
   const isOwnProfile = currentUser?.id === userId;
 

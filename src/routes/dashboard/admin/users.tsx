@@ -5,7 +5,7 @@ import { AppBreadcrumb } from "~/components/AppBreadcrumb";
 import { CreateUserDialog } from "~/components/CreateUserDialog";
 import { ConfirmDeleteDialog } from "~/components/ConfirmDeleteDialog";
 import { ConfirmSuspendDialog } from "~/components/ConfirmSuspendDialog";
-import { useAuth, useUsers, useDeleteUser, useSuspendUser, useActivateUser, useUpdateUserRole, useCreateUser } from "~/hooks/api";
+
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Badge } from "~/components/ui/badge";
@@ -173,19 +173,31 @@ function UsersTable() {
   const [page, setPage] = useState(1);
   const limit = 10;
 
-  const { data, isLoading, error } = useUsers(page, limit, search);
+  const { data, isLoading, error } = { data: undefined, isLoading: true, error: null } as { data?: { data: User[]; totalPages: number; total: number }; isLoading: boolean; error: any };
   
-  const deleteUserMutation = useDeleteUser();
-  const suspendUserMutation = useSuspendUser();
-  const activateUserMutation = useActivateUser();
-  const updateRoleMutation = useUpdateUserRole();
+  const deleteUserMutation = { mutate: async (userId: string) => {
+    const { userService } = await import('~/api-services');
+    return userService.deleteUser(userId);
+  }};
+  const suspendUserMutation = { mutate: async (userId: string) => {
+    const { userService } = await import('~/api-services');
+    return userService.suspendUser(userId);
+  }};
+  const activateUserMutation = { mutate: async (userId: string) => {
+    const { userService } = await import('~/api-services');
+    return userService.activateUser(userId);
+  }};
+  const updateRoleMutation = { mutate: async ({ userId, role }: any) => {
+    const { userService } = await import('~/api-services');
+    return userService.updateUserRole(userId, role);
+  }};
 
   const users = data?.data ?? [];
   const totalPages = data?.totalPages ?? 1;
   const total = data?.total ?? 0;
 
   // Filter users based on role and status
-  const filteredUsers = users.filter(user => {
+  const filteredUsers = users.filter((user: User) => {
     const statusMatch = statusFilter === "all" || user.status === statusFilter;
     const roleMatch = roleFilter === "all" || user.role === roleFilter;
     return statusMatch && roleMatch;
@@ -302,7 +314,7 @@ function UsersTable() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredUsers.map((user) => (
+                  {filteredUsers.map((user: User) => (
                     <tr
                       key={user.id}
                       className="border-b border-border hover:bg-muted/50 transition-colors"

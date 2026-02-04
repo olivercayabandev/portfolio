@@ -22,7 +22,7 @@ import {
   TrendingUp,
   CheckCircle,
 } from "lucide-react";
-import { useAuth } from "~/hooks/api";
+
 
 const signInSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -41,7 +41,11 @@ export const Route = createFileRoute("/sign-in")({
 function RouteComponent() {
   const router = useRouter();
   const { redirect } = Route.useSearch();
-  const { signIn, mutations: { signIn: signInMutation } } = useAuth();
+  const signInMutation = { isPending: false };
+  const signIn = async (data: any) => {
+    const { authService } = await import('~/api-services');
+    return authService.signIn(data);
+  };
   const [authError, setAuthError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);

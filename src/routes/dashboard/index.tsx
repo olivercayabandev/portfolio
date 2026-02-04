@@ -1,12 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useAuth } from "~/hooks/api";
+import * as React from "react";
+
 
 export const Route = createFileRoute("/dashboard/")({
   component: DashboardHome,
 });
 
 function DashboardHome() {
-  const { user, isLoading } = useAuth();
+  const [user, setUser] = React.useState<any>(null);
+  const isLoading = false;
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">

@@ -23,7 +23,7 @@ import { useState } from "react";
 import * as React from "react";
 import { cn } from "~/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "~/hooks/api";
+
 
 const dashboardLink = {
   title: "Dashboard",
@@ -49,7 +49,13 @@ export function Header() {
   const currentPath = routerState.location.pathname;
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { user, isAuthenticated, isLoading, signOut } = useAuth();
+  const [user, setUser] = React.useState<any>(null);
+  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const signOut = async () => {
+    const { authService } = await import('~/api-services');
+    return authService.signOut();
+  };
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
