@@ -48,22 +48,6 @@ export interface UpdatePasswordRequest {
   password: string;
 }
 
-// File and Storage related types
-export interface FileUpload {
-  id: string;
-  name: string;
-  type: string;
-  size: number;
-  url: string;
-  uploadedAt: string;
-}
-
-export interface PresignedUploadUrl {
-  uploadUrl: string;
-  fileUrl: string;
-  fields?: Record<string, string>;
-}
-
 // API Response wrappers
 export interface PaginatedResponse<T> {
   data: T[];
@@ -84,21 +68,6 @@ export interface ApiError {
   message: string;
   code?: string;
   details?: unknown;
-}
-
-// Request/Response transformers
-export interface CreateUserRequest {
-  name: string;
-  email: string;
-  password: string;
-  role?: 'admin' | 'guest';
-}
-
-export interface UpdateUserRequest {
-  name?: string;
-  email?: string;
-  status?: 'active' | 'suspended';
-  role?: 'super_admin' | 'admin' | 'guest';
 }
 
 export interface UpdateProfileRequest {

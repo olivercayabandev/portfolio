@@ -1,7 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Hero } from "~/components/Hero";
-import { FinalCTASection } from "~/components/FinalCTASection";
-import { SectionDivider } from "~/components/SectionDivider";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Button } from "~/components/ui/button";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -9,23 +7,27 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   return (
-    <div className="flex flex-col min-h-[calc(100vh-3.5rem)] relative">
-      {/* Noise Texture */}
-      <div className="noise-overlay"></div>
-
-      {/* Background Ambience */}
-      <div className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden bg-background">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(var(--foreground),0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(var(--foreground),0.03)_1px,transparent_1px)] bg-[length:40px_40px] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_100%)] opacity-20"></div>
-        <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-primary/20 rounded-full blur-[128px] animate-blob"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-purple-500/15 rounded-full blur-[128px] animate-blob animation-delay-2000"></div>
-        <div className="absolute top-[40%] left-[30%] w-[300px] h-[300px] bg-teal-400/10 rounded-full blur-[100px] animate-pulse-slow"></div>
+    <div className="container mx-auto min-h-[calc(100vh-3.5rem)] flex items-center justify-center">
+      <div className="text-center space-y-8 max-w-xl">
+        <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
+          Welcome to Your App
+        </h1>
+        <p className="text-lg text-muted-foreground">
+          A modern starter pack built with React, TypeScript, and TanStack Router
+        </p>
+        <div className="flex gap-4 justify-center">
+          <Link to="/sign-in">
+            <Button size="lg">
+              Sign In
+            </Button>
+          </Link>
+          <Link to="/sign-up">
+            <Button variant="outline" size="lg">
+              Sign Up
+            </Button>
+          </Link>
+        </div>
       </div>
-
-      <main className="flex-1 relative z-10">
-        <Hero />
-        <SectionDivider />
-        <FinalCTASection />
-      </main>
     </div>
   );
 }
