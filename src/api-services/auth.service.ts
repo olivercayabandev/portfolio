@@ -11,27 +11,32 @@ import {
 
 export class AuthService {
   async signIn(credentials: SignInRequest): Promise<AuthResponse> {
-    const response = await apiClient.post<AuthResponse>('/auth/signin', credentials);
+    const response = await apiClient.post<AuthResponse>('/auth/login', credentials);
+    // response.data is the AuthResponse { user, tokens }
+    const authData = response.data;
     
     // Store tokens in localStorage
-    if (response.success && response.data.tokens) {
-      localStorage.setItem('auth_token', response.data.tokens.accessToken);
-      localStorage.setItem('refresh_token', response.data.tokens.refreshToken);
+    if (response.success && authData.tokens) {
+      localStorage.setItem('auth_token', authData.tokens.accessToken);
+      localStorage.setItem('refresh_token', authData.tokens.refreshToken);
     }
     
-    return response.data;
+    return authData;
   }
 
   async signUp(userData: SignUpRequest): Promise<AuthResponse> {
-    const response = await apiClient.post<AuthResponse>('/auth/signup', userData);
+    const response = await apiClient.post<AuthResponse>('/auth/register', userData);
+    
+    // response.data is the AuthResponse { user, tokens }
+    const authData = response.data;
     
     // Store tokens in localStorage
-    if (response.success && response.data.tokens) {
-      localStorage.setItem('auth_token', response.data.tokens.accessToken);
-      localStorage.setItem('refresh_token', response.data.tokens.refreshToken);
+    if (response.success && authData.tokens) {
+      localStorage.setItem('auth_token', authData.tokens.accessToken);
+      localStorage.setItem('refresh_token', authData.tokens.refreshToken);
     }
     
-    return response.data;
+    return authData;
   }
 
   async signOut(): Promise<void> {

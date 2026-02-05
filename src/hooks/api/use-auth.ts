@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useState } from 'react';
 import { authService, type User } from '~/api-services';
-import type { SignInRequest, SignUpRequest } from '~/api-services/types';
+import type { SignInRequest, SignUpRequest, AuthResponse } from '~/api-services/types';
 
 export function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
@@ -34,12 +34,17 @@ export function useAuth() {
     checkAuth();
   }, []);
 
-  const signInMutation = useMutation({
+  const signInMutation = useMutation<AuthResponse, Error, SignInRequest>({
     mutationFn: authService.signIn.bind(authService),
-    onSuccess: (data: { user: User }) => {
-      setUser(data.user);
-      setIsAuthenticated(true);
-      queryClient.invalidateQueries({ queryKey: ['auth'] });
+    onSuccess: (data) => {
+      // Handle the response - data is AuthResponse { user, tokens }
+      if (data && data.user) {
+        setUser(data.user);
+        setIsAuthenticated(true);
+        queryClient.invalidateQueries({ queryKey: ['auth'] });
+      } else {
+        throw new Error('Invalid response from server');
+      }
     },
     onError: (error: Error) => {
       console.error('Sign in failed:', error);
@@ -48,12 +53,17 @@ export function useAuth() {
     },
   });
 
-  const signUpMutation = useMutation({
+  const signUpMutation = useMutation<AuthResponse, Error, SignUpRequest>({
     mutationFn: authService.signUp.bind(authService),
-    onSuccess: (data: { user: User }) => {
-      setUser(data.user);
-      setIsAuthenticated(true);
-      queryClient.invalidateQueries({ queryKey: ['auth'] });
+    onSuccess: (data) => {
+      // Handle the response - data is AuthResponse { user, tokens }
+      if (data && data.user) {
+        setUser(data.user);
+        setIsAuthenticated(true);
+        queryClient.invalidateQueries({ queryKey: ['auth'] });
+      } else {
+        throw new Error('Invalid response from server');
+      }
     },
     onError: (error: Error) => {
       console.error('Sign up failed:', error);
