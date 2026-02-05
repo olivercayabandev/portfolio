@@ -129,7 +129,7 @@ function Home() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link to="/sign-in">
+            <Link to="/auth/signin">
               <Button size="lg" className="min-w-[140px]">
                 Get Started
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -393,7 +393,7 @@ function Home() {
               Clean architecture, type safety, and modern tooling included.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/sign-in">
+              <Link to="/auth/signin">
                 <Button size="lg" className="min-w-[160px]">
                   Try Demo
                   <ArrowRight className="ml-2 h-4 w-4" />
