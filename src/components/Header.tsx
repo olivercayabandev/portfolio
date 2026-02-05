@@ -221,8 +221,7 @@ export function Header() {
               <>
                 <Link
                   className={buttonVariants({ variant: "default" })}
-                  to="/sign-in"
-                  search={{ redirect: undefined }}
+                  to="/auth/signin"
                 >
                   Sign In
                 </Link>
