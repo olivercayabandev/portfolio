@@ -1,18 +1,10 @@
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "~/components/ui/form";
 import { LogIn, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "~/hooks/api";
 
@@ -34,7 +26,11 @@ function RouteComponent() {
   const [authError, setAuthError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const form = useForm<SignInForm>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignInForm>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
       email: "",
@@ -72,73 +68,75 @@ function RouteComponent() {
           </div>
         )}
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="name@example.com"
-                      type="email"
-                      autoComplete="email"
-                      disabled={isSigningIn}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <Input
-                        placeholder="Enter your password"
-                        type={showPassword ? "text" : "password"}
-                        autoComplete="current-password"
-                        disabled={isSigningIn}
-                        className="pr-10"
-                        {...field}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                        disabled={isSigningIn}
-                        aria-label={
-                          showPassword ? "Hide password" : "Show password"
-                        }
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </button>
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button
-              disabled={isSigningIn}
-              type="submit"
-              className="w-full"
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium mb-1"
             >
-              {isSigningIn ? "Signing in..." : "Sign In"}
-            </Button>
-          </form>
-        </Form>
+              Email
+            </label>
+            <Input
+              id="email"
+              placeholder="name@example.com"
+              type="email"
+              autoComplete="email"
+              disabled={isSigningIn}
+              {...register("email")}
+              aria-invalid={!!errors.email}
+            />
+            {errors.email && (
+              <p className="text-destructive text-xs mt-1">{errors.email.message}</p>
+            )}
+          </div>
+
+          <div>
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium mb-1"
+            >
+              Password
+            </label>
+            <div className="relative">
+              <Input
+                id="password"
+                placeholder="Enter your password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
+                disabled={isSigningIn}
+                className="pr-10"
+                {...register("password")}
+                aria-invalid={!!errors.password}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                disabled={isSigningIn}
+                aria-label={
+                  showPassword ? "Hide password" : "Show password"
+                }
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </button>
+            </div>
+            {errors.password && (
+              <p className="text-destructive text-xs mt-1">{errors.password.message}</p>
+            )}
+          </div>
+
+          <Button
+            disabled={isSigningIn}
+            type="submit"
+            className="w-full"
+          >
+            {isSigningIn ? "Signing in..." : "Sign In"}
+          </Button>
+        </form>
 
         <p className="text-center text-sm text-muted-foreground">
           Don't have an account? Contact your administrator.

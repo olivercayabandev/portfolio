@@ -4,8 +4,8 @@ export interface User {
   email: string;
   emailVerified: boolean;
   image?: string;
-  role: 'super_admin' | 'admin' | 'guest';
-  status: 'active' | 'suspended';
+  role: "super_admin" | "admin" | "guest";
+  status: "active" | "suspended";
   createdAt: string;
   updatedAt: string;
 }
@@ -28,7 +28,8 @@ export interface SignInRequest {
 }
 
 export interface SignUpRequest {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
 }
@@ -52,21 +53,21 @@ export interface GetUsersParams {
   page?: number;
   limit?: number;
   sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }
 
 export interface CreateUserInput {
   name: string;
   email: string;
   password: string;
-  role?: 'super_admin' | 'admin' | 'guest';
+  role?: "super_admin" | "admin" | "guest";
 }
 
 export interface UpdateUserInput {
   name?: string;
   email?: string;
-  role?: 'super_admin' | 'admin' | 'guest';
-  status?: 'active' | 'suspended';
+  role?: "super_admin" | "admin" | "guest";
+  status?: "active" | "suspended";
 }
 
 export interface UpdateProfileRequest {
