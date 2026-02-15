@@ -151,8 +151,8 @@ export const portfolioData: PortfolioData = {
   contact: [
     {
       type: "email",
-      url: "mailto:oliver@example.com",
-      label: "oliver@example.com"
+      url: "mailto:olivercayaban.dev@gmail.com",
+      label: "olivercayaban3@gmail.com"
     },
     {
       type: "linkedin",
